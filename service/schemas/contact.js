@@ -1,15 +1,5 @@
 const { Schema, model } = require('mongoose')
-/*
 
-name
-"Allen Raymond"
-email
-"nulla.ante@vestibul.co.uk"
-phone
-"(992) 914-3792"
-favorite
-false
-*/
 const contact = new Schema(
   {
     name: {
