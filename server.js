@@ -43,12 +43,15 @@ const connection = mongoose.connect(uriDb, {
 connection
   .then(() => {
     app.listen(PORT, function () {
-      console.log(`Server running. Use our API on port: ${PORT}`)
+      console.log(
+        `Database connection successful. Server running. Use our API on port: ${PORT}`,
+      )
     })
   })
-  .catch((err) =>
-    console.log(`Server not running. Error message: ${err.message}`),
-  )
+  .catch((err) => {
+    console.log(`Server not running. Error message: ${err.message}`)
+    process.exit(1)
+  })
 /*
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://<username>:<password>@cluster0.hgqfbpu.mongodb.net/?retryWrites=true&w=majority";

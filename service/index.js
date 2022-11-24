@@ -5,7 +5,8 @@ const getAllContacts = async () => {
 }
 
 const getContactById = (id) => {
-  return Contact.findOne({ _id: id })
+  return Contact.findById(id)
+  // return Contact.findOne({ _id: id })
 }
 
 const createContact = ({ name, email, phone, favorite }) => {
@@ -13,6 +14,7 @@ const createContact = ({ name, email, phone, favorite }) => {
 }
 
 const updateContact = (id, fields) => {
+  console.log(id, fields)
   return Contact.findByIdAndUpdate({ _id: id }, fields, { new: true })
 }
 
@@ -27,3 +29,10 @@ module.exports = {
   updateContact,
   removeContact,
 }
+/*
+ "_id": "637d272c818ea032f1e27826",
+            "name": "Allen Raymond",
+            "email": "nulla.ante@vestibul.co.uk",
+            "phone": "(992) 914-3792",
+            "favorite": false
+*/

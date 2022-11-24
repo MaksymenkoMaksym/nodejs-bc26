@@ -22,6 +22,7 @@ const getById = async (req, res, next) => {
   const { contactId } = req.params
   try {
     const contact = await service.getContactById(contactId)
+    console.log(contact)
     if (contact) {
       res.json({
         status: 'success',
@@ -76,6 +77,7 @@ const addContact = async (req, res, next) => {
     email: Joi.string()
       .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
       .required(),
+    favorite: Joi.boolean(),
   })
 
   const { error, value } = schema1.validate(req.body)
@@ -110,14 +112,29 @@ const addContact = async (req, res, next) => {
   }
 }
 
-const updateContact = async (req, res, next, body) => {
+const updateContact = async (req, res, next) => {
+  const schema1 = Joi.object({
+    name: Joi.string().min(3).max(30).required(),
+    phone: Joi.string().required(),
+    email: Joi.string()
+      .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+      .required(),
+    favorite: Joi.boolean(),
+  })
+
+  const { error, value } = schema1.validate(req.body)
+  const { name, email, phone } = value
+
   const { contactId } = req.params
-  const { name, email, phone } = req.body
-  if (!name && !email && !phone) {
-    return res.status(400).json({ message: 'missing fields' })
+
+  if (error) {
+    return res.status(400).json({ message: `${error}` })
+  }
+  if (!name || !email || !phone) {
+    return res.status(400).json({ message: 'missing required field' })
   }
   try {
-    const updatedContact = await service.updateContact(contactId, req.body)
+    const updatedContact = await service.updateContact(contactId, value)
 
     if (updatedContact) {
       res.json({
@@ -140,10 +157,60 @@ const updateContact = async (req, res, next, body) => {
   }
 }
 
+const updateStatusContact = async (req, res, next) => {
+  const schema1 = Joi.object({
+    name: Joi.string().min(3).max(30).required(),
+    phone: Joi.string().required(),
+    email: Joi.string()
+      .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+      .required(),
+    favorite: Joi.boolean().required(),
+  })
+
+  const { error, value } = schema1.validate(req.body)
+  const { name, email, phone, favorite } = value
+
+  const { contactId } = req.params
+
+  if (error) {
+    return res.status(400).json({ message: `${error}` })
+  }
+  if (!name || !email || !phone) {
+    return res.status(400).json({ message: 'missing required field' })
+  }
+
+  if (!favorite) {
+    return res.status(400).json({ message: 'missing field favorite' })
+  }
+
+  try {
+    const updatedContact = await service.updateContact(contactId, value)
+
+    if (updatedContact) {
+      res.json({
+        status: 'success',
+        code: 200,
+        data: { contact: updatedContact },
+      })
+    } else {
+      res.status(404).json({
+        status: 'error',
+        code: 404,
+        message: `Not found`,
+        data: 'Not Found',
+      })
+    }
+    return updatedContact
+  } catch (e) {
+    console.log(`Error:${e} occurred when try to add contact`)
+    next(e)
+  }
+}
 module.exports = {
   get,
   getById,
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 }
