@@ -1,6 +1,6 @@
 const Joi = require('joi')
 
-const service = require('../service')
+const service = require('../../service')
 
 const get = async (req, res, next) => {
   try {
