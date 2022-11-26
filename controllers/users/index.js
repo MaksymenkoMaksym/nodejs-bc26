@@ -1,14 +1,29 @@
-const Joi = require('joi')
+// const Joi = require('joi')
+const jwt = require('jsonwebtoken')
 const service = require('../../service')
 require('dotenv').config()
 const secret = process.env.SECRET
 const passport = require('passport')
-const passportJWT = require('passport-jwt')
+
+const auth = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
+    if (!user || err) {
+      return res.status(401).json({
+        status: 'error',
+        code: 401,
+        message: 'Unauthorized',
+        data: 'Unauthorized',
+      })
+    }
+    req.user = user
+    next()
+  })(req, res, next)
+}
 
 const loginUser = async (req, res, next) => {
   const { email, password } = req.body
-  const isValidPassword = await service.isValidPassword(email, password)
-  if (!isValidPassword) {
+  const user = await service.authUser(email, password)
+  if (!user) {
     return res.status(400).json({
       status: 'error',
       code: 400,
@@ -16,18 +31,25 @@ const loginUser = async (req, res, next) => {
       data: 'Bad request',
     })
   }
+
+  const payload = {
+    id: user._id,
+    email: user.email,
+  }
+  const token = jwt.sign(payload, secret, { expiresIn: '1h' })
+
   res.json({
     status: 'success',
     code: 200,
     data: {
-      password,
+      token,
     },
   })
 }
 
 const registerUser = async (req, res, next) => {
   const { email, subscription, password } = req.body
-  const user = await service.isValidPassword(email, password)
+  const user = await service.authUser(email, password)
   if (user) {
     return res.status(409).json({
       status: 'error',
@@ -55,7 +77,33 @@ const registerUser = async (req, res, next) => {
   }
 }
 
+const logoutUser = async (req, res, next) => {
+  const { email, password } = req.body
+  const user = await service.authUser(email, password)
+
+  if (!user) {
+    return res.status(401).json({
+      status: 'error',
+      code: 401,
+      message: 'Not authorized',
+      data: 'Bad request',
+    })
+  }
+
+  req.logout()
+  res.redirect('/users/login')
+
+  res.status(204).json({
+    status: 'Logout success',
+    code: 204,
+    data: {
+      token: null,
+    },
+  })
+}
 module.exports = {
+  auth,
   loginUser,
   registerUser,
+  logoutUser,
 }

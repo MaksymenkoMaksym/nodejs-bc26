@@ -23,7 +23,7 @@ app.use(
   }),
 )
 app.use(express.json())
-
+require('./config/passport-config.js')
 app.use('/', routerApi)
 
 app.use((req, res) => {
