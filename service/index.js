@@ -22,8 +22,8 @@ const removeContact = (id) => {
   return Contact.findByIdAndRemove({ _id: id })
 }
 
-const createUser = async (subscription, email, password) => {
-  const newUser = new User({ subscription, email })
+const createUser = async ({ subscription, email, password }) => {
+  const newUser = new User({ email })
   newUser.setPassword(password)
   await newUser.save()
 }
@@ -32,6 +32,14 @@ const authUser = (email) => {
   return User.findOne({ email })
 }
 
+const isValidPassword = async (email, password) => {
+  const user = await User.findOne({ email })
+  console.log(user)
+  if (user) {
+    return user.validPassword(password)
+  }
+  return user
+}
 module.exports = {
   getAllContacts,
   getContactById,
@@ -40,4 +48,5 @@ module.exports = {
   removeContact,
   createUser,
   authUser,
+  isValidPassword,
 }
