@@ -37,6 +37,7 @@ const loginUser = async (req, res, next) => {
     email: user.email,
   }
   const token = jwt.sign(payload, secret, { expiresIn: '1h' })
+  await service.updateUser(user._id, { token })
 
   res.json({
     status: 'success',
@@ -78,20 +79,7 @@ const registerUser = async (req, res, next) => {
 }
 
 const logoutUser = async (req, res, next) => {
-  const { email, password } = req.body
-  const user = await service.authUser(email, password)
-
-  if (!user) {
-    return res.status(401).json({
-      status: 'error',
-      code: 401,
-      message: 'Not authorized',
-      data: 'Bad request',
-    })
-  }
-
-  req.logout()
-  res.redirect('/users/login')
+  await service.updateUser(req.user._id, { token: null })
 
   res.status(204).json({
     status: 'Logout success',
@@ -101,9 +89,23 @@ const logoutUser = async (req, res, next) => {
     },
   })
 }
+
+const getUserData = async (req, res, next) => {
+  const { email, subscription } = req.user
+  res.json({
+    status: 'success',
+    code: 200,
+    data: {
+      email,
+      subscription,
+    },
+  })
+}
+
 module.exports = {
   auth,
   loginUser,
   registerUser,
   logoutUser,
+  getUserData,
 }

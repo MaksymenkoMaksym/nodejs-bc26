@@ -27,14 +27,11 @@ const createUser = async ({ subscription, email, password }) => {
   newUser.setPassword(password)
   await newUser.save()
 }
-
-// const authUser = (email) => {
-//   return User.findOne({ email })
-// }
-
+const updateUser = (id, fields) => {
+  return User.findByIdAndUpdate({ _id: id }, fields, { new: true })
+}
 const authUser = async (email, password) => {
   const user = await User.findOne({ email })
-  console.log(user)
   if (user) {
     const result = user.validPassword(password)
     return result ? user : null
@@ -48,6 +45,6 @@ module.exports = {
   updateContact,
   removeContact,
   createUser,
+  updateUser,
   authUser,
-  // isValidPassword,
 }

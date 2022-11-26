@@ -22,7 +22,9 @@ app.use(
     optionsSuccessStatus: 204,
   }),
 )
+
 app.use(express.json())
+
 require('./config/passport-config.js')
 app.use('/', routerApi)
 
