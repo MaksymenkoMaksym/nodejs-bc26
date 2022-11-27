@@ -25,7 +25,7 @@ const removeContact = (id) => {
 const createUser = async ({ subscription, email, password }) => {
   const newUser = new User({ email })
   newUser.setPassword(password)
-  await newUser.save()
+  return await newUser.save()
 }
 const updateUser = (id, fields) => {
   return User.findByIdAndUpdate({ _id: id }, fields, { new: true })

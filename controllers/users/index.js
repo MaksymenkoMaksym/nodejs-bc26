@@ -1,9 +1,29 @@
-// const Joi = require('joi')
+const Joi = require('joi')
 const jwt = require('jsonwebtoken')
 const service = require('../../service')
 require('dotenv').config()
 const secret = process.env.SECRET
 const passport = require('passport')
+
+const validate = (req, res) => {
+  const schemaUser = Joi.object({
+    password: Joi.string().min(8).max(30).required(),
+    email: Joi.string()
+      .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+      .required(),
+    subscription: Joi.string(),
+  })
+
+  const { error, value } = schemaUser.validate(req.body)
+  const { email, password } = value
+  if (error) {
+    return res.status(400).json({ message: `${error}` })
+  }
+  if (!email || !password) {
+    return res.status(400).json({ message: 'missing required name field' })
+  }
+  return value
+}
 
 const auth = (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
@@ -21,7 +41,7 @@ const auth = (req, res, next) => {
 }
 
 const loginUser = async (req, res, next) => {
-  const { email, password } = req.body
+  const { email, password } = validate(req, res)
   const user = await service.authUser(email, password)
   if (!user) {
     return res.status(400).json({
@@ -49,7 +69,7 @@ const loginUser = async (req, res, next) => {
 }
 
 const registerUser = async (req, res, next) => {
-  const { email, subscription, password } = req.body
+  const { email, subscription, password } = validate(req, res)
   const user = await service.authUser(email, password)
   if (user) {
     return res.status(409).json({
