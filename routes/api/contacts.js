@@ -10,26 +10,27 @@ const {
 } = require('../../controllers/contacts')
 
 const {
-  loginUser,
-  registerUser,
   auth,
-  logoutUser,
-  getUserData,
-} = require('../../controllers/users')
+  validateStatusContact,
+  validateContact,
+} = require('../../middleware')
 const router = express.Router()
 
 router.get('/contacts', auth, get)
 
 router.get('/contacts/:contactId', auth, getById)
-router.post('/contacts', auth, addContact)
+router.post('/contacts', auth, validateContact, addContact)
 
 router.delete('/contacts/:contactId', auth, removeContact)
 
-router.put('/contacts/:contactId', auth, updateContact)
+router.put('/contacts/:contactId', auth, validateContact, updateContact)
 
-router.put('/contacts/:contactId/favorite', auth, updateStatusContact)
-
-// login / register
+router.put(
+  '/contacts/:contactId/favorite',
+  auth,
+  validateStatusContact,
+  updateStatusContact,
+)
 
 router.get('/contacts', auth, (req, res, next) => {
   const { email } = req.user
@@ -41,13 +42,5 @@ router.get('/contacts', auth, (req, res, next) => {
     },
   })
 })
-
-router.post('/users/signup', registerUser)
-
-router.post('/users/login', loginUser)
-
-router.get('/users/logout', auth, logoutUser)
-
-router.get('/users/current', auth, getUserData)
 
 module.exports = router

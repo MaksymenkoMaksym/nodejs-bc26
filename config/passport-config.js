@@ -1,6 +1,6 @@
 const passport = require('passport')
 const passportJWT = require('passport-jwt')
-const User = require('../service/schemas/user')
+const User = require('../models/user')
 
 require('dotenv').config()
 const secret = process.env.SECRET
@@ -13,7 +13,6 @@ const params = {
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
 }
 
-// JWT
 passport.use(
   new Strategy(params, function (payload, done) {
     User.findById(payload.id)
