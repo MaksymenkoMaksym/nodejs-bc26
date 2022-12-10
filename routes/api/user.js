@@ -8,6 +8,7 @@ const {
   updateSubscription,
   getAvatar,
   verifyToken,
+  verifyRepeat,
 } = require('../../controllers/users')
 
 const {
@@ -37,5 +38,7 @@ router.patch(
 )
 
 router.get('/users/verify/:verificationToken', verifyToken)
+
+router.post('/users/verify/', verifyRepeat)
 
 module.exports = router

@@ -1,10 +1,19 @@
 const User = require('../models/user')
 const gravatar = require('gravatar')
+const { randomUUID } = require('crypto')
+const sendVerificationMail = require('../helper/sendMail')
 
 const createUser = async ({ subscription, email, password }) => {
   const avatarURL = gravatar.url(email)
-  const verificationToken = 
-  const newUser = new User({ email, subscription, avatarURL, verificationToken })
+  const verificationToken = randomUUID()
+  sendVerificationMail(email, verificationToken)
+
+  const newUser = new User({
+    email,
+    subscription,
+    avatarURL,
+    verificationToken,
+  })
   newUser.setPassword(password)
   return await newUser.save()
 }
@@ -29,9 +38,15 @@ const verifyToken = async (verificationToken) => {
   const user = await User.findOne({ verificationToken })
   return user
 }
+
+const verifyMail = async (email) => {
+  const user = await User.findOne({ email })
+  return user
+}
 module.exports = {
   createUser,
   updateUser,
   authUser,
   verifyToken,
+  verifyMail,
 }

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const sendVerificationMail = require('../../helper/sendMail')
 const service = require('../../service/user')
 require('dotenv').config()
 const secret = process.env.SECRET
@@ -118,26 +119,55 @@ const getAvatar = async (req, res, next) => {
 
 const verifyToken = async (req, res, next) => {
   const { verificationToken } = req.params
-  const user = await service.verifyToken(verificationToken)
 
-  if (!user) {
-    return res.status(404).json({
-      status: 'error',
-      code: 404,
-      message: 'User not found',
+  try {
+    const user = await service.verifyToken(verificationToken)
+
+    if (!user) {
+      return res.status(404).json({
+        status: 'error',
+        code: 404,
+        message: 'User not found',
+      })
+    }
+
+    const response = await service.updateUser(user._id, {
+      verificationToken: 'null',
+      verify: true,
     })
+    res.json({
+      status: 'Ok',
+      code: 200,
+      message: 'All ok',
+      data: response,
+    })
+  } catch (error) {
+    next(error)
   }
+}
+const verifyRepeat = async (req, res, next) => {
+  const { email } = req.body
 
-  const response = await service.updateUser(user._id, {
-    verificationToken: null,
-    verify: true,
-  })
-  res.json({
-    status: 'Ok',
-    code: 200,
-    message: 'All ok',
-    data: response,
-  })
+  try {
+    const user = await service.verifyMail(email)
+
+    if (!user) {
+      return res.status(404).json({
+        status: 'error',
+        code: 404,
+        message: 'User not found',
+      })
+    }
+    sendVerificationMail(email, user.verificationToken)
+
+    res.json({
+      status: 'Ok',
+      code: 200,
+      message: 'Email send',
+    })
+  } catch (error) {
+    next(error)
+  }
 }
 
 module.exports = {
@@ -148,4 +178,5 @@ module.exports = {
   updateSubscription,
   getAvatar,
   verifyToken,
+  verifyRepeat,
 }
