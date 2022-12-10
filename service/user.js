@@ -24,8 +24,13 @@ const authUser = async (email, password) => {
   return user
 }
 
+const verifyToken = async (verificationToken) => {
+  const user = await User.findOne({ verificationToken })
+  return user
+}
 module.exports = {
   createUser,
   updateUser,
   authUser,
+  verifyToken,
 }

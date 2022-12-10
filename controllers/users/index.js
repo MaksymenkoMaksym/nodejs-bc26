@@ -115,6 +115,31 @@ const getAvatar = async (req, res, next) => {
     next(error)
   }
 }
+
+const verifyToken = async (req, res, next) => {
+  const { verificationToken } = req.params
+  const user = await service.verifyToken(verificationToken)
+
+  if (!user) {
+    return res.status(404).json({
+      status: 'error',
+      code: 404,
+      message: 'User not found',
+    })
+  }
+
+  const response = await service.updateUser(user._id, {
+    verificationToken: null,
+    verify: true,
+  })
+  res.json({
+    status: 'Ok',
+    code: 200,
+    message: 'All ok',
+    data: response,
+  })
+}
+
 module.exports = {
   loginUser,
   registerUser,
@@ -122,4 +147,5 @@ module.exports = {
   getUserData,
   updateSubscription,
   getAvatar,
+  verifyToken,
 }
