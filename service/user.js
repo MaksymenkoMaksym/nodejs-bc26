@@ -1,7 +1,9 @@
 const User = require('../models/user')
+const gravatar = require('gravatar')
 
 const createUser = async ({ subscription, email, password }) => {
-  const newUser = new User({ email, subscription })
+  const avatarURL = gravatar.url(email)
+  const newUser = new User({ email, subscription, avatarURL })
   newUser.setPassword(password)
   return await newUser.save()
 }

@@ -6,6 +6,7 @@ const {
   logoutUser,
   getUserData,
   updateSubscription,
+  getAvatar,
 } = require('../../controllers/users')
 
 const {
@@ -13,6 +14,8 @@ const {
   auth,
   validateUserSubscription,
 } = require('../../middleware')
+const upload = require('../../middleware/setAvatarMiddleware')
+
 router.post('/users/signup', validateUserData, registerUser)
 
 router.post('/users/login', validateUserData, loginUser)
@@ -23,4 +26,5 @@ router.get('/users/current', auth, getUserData)
 
 router.patch('/users', auth, validateUserSubscription, updateSubscription)
 
+router.patch('/users/avatars', auth, upload.single('avatar'), getAvatar)
 module.exports = router
