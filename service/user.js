@@ -3,7 +3,8 @@ const gravatar = require('gravatar')
 
 const createUser = async ({ subscription, email, password }) => {
   const avatarURL = gravatar.url(email)
-  const newUser = new User({ email, subscription, avatarURL })
+  const verificationToken = 
+  const newUser = new User({ email, subscription, avatarURL, verificationToken })
   newUser.setPassword(password)
   return await newUser.save()
 }
