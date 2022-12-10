@@ -14,6 +14,7 @@ const {
   auth,
   validateUserSubscription,
 } = require('../../middleware')
+const { editAvatar } = require('../../middleware/avatarMiddleware')
 const upload = require('../../middleware/setAvatarMiddleware')
 
 router.post('/users/signup', validateUserData, registerUser)
@@ -26,5 +27,11 @@ router.get('/users/current', auth, getUserData)
 
 router.patch('/users', auth, validateUserSubscription, updateSubscription)
 
-router.patch('/users/avatars', auth, upload.single('avatar'), getAvatar)
+router.patch(
+  '/users/avatars',
+  auth,
+  upload.single('avatar'),
+  editAvatar,
+  getAvatar,
+)
 module.exports = router

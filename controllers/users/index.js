@@ -100,7 +100,7 @@ const updateSubscription = async (req, res, next) => {
 
 const getAvatar = async (req, res, next) => {
   const { _id: id } = req.user
-  const { avatarURL } = req.file
+  const avatarURL = req.file.path
   try {
     await service.updateUser(id, { avatarURL })
 
