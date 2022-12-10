@@ -14,6 +14,7 @@ const updateUser = (id, fields) => {
     runValidators: true,
   })
 }
+
 const authUser = async (email, password) => {
   const user = await User.findOne({ email })
   if (user) {
@@ -22,6 +23,7 @@ const authUser = async (email, password) => {
   }
   return user
 }
+
 module.exports = {
   createUser,
   updateUser,
